@@ -1,0 +1,348 @@
+<html>
+
+<head>
+   <title>
+      SVGAlib Tutorials
+   </title>
+</head>
+
+<body bgcolor="#FFFFFF" vlink="#000099">
+
+<center>
+<table width=700 border=0 cellpadding=0 cellspacing=0>
+<tr><td>
+<img src="http://www.svgalib.org/tutorial.gif" border=0><br>
+<img src="http://www.svgalib.org/graydot2.gif" width=700 height=1 border=0 vspace=5>
+</td></tr>
+</table>
+</center>
+
+<center>
+<p><table width=700 border=0 cellpadding=0 cellspacing=0>
+<tr><td width=500>
+
+<font face="verdana,arial,helvetica" size=2>
+
+<p><b>Easy Graphics: A Beginner's Guide to SVGAlib</b><br>
+by <a href="mailto:jlink@svgalib.org">Jay Link</a>
+
+<p>Are you looking for a simple graphics package for your Linux system? If
+so, look no further. SVGAlib provides an easy way to create graphical
+applications and eliminates the rigmarole of the X Window System. If you
+have even the most rudimentary grasp of programming in C, then you can use
+SVGAlib.
+
+<p><b>What is SVGAlib?</b>
+
+<p>SVGAlib is a low-level graphics library for Linux. It augments the C
+programming language, which doesn't provide support for graphics.
+ 
+<p><i>But there are lots of graphics programs written in C!</i>
+
+<p>Yes, but they all rely on external library functions. C itself can only
+give you text. That's because all graphic functions are system dependent
+and are non-portable. Unfortunately, graphic routines coded for one
+operating system will not work under another unless they are completely
+rewritten. For example, graphics originally written for DOS or Windows are
+useless under Linux.
+
+<p>To code graphics in C under Linux, it is necessary to use an external
+set of functions which are native to Linux. SVGAlib is one such set.
+
+<p><b>How is SVGAlib different from the X Window System?</b>
+
+<p>The X Window System (XFree86) is actually a server. This server must be
+started prior to using any applications which require X. Furthermore, the
+X server is unabashedly system-intensive (i.e. it's piggy with your
+resources), and when using some video cards it will prohibit you from using
+your virtual terminals (Alt 1-6).
+
+<p>SVGAlib, on the other hand, requires no such preparation. You do not
+"run"  SVGAlib like you do X Windows. SVGAlib is simply a binary C library
+which is called by C programs, just like all the other libraries in /lib
+and /usr/lib. If SVGAlib is properly installed, the average user shouldn't
+even be aware of its existence. Finally, SVGAlib will not affect your
+virtual terminals, leaving you free to run multiple applications like
+always. You can have normal text on one terminal and graphics on another.
+
+<p><b>Drawbacks</b>
+
+<p>There are many more applications available for X Windows than there are
+for SVGAlib, due to the fact that the X Window System is cross-platform
+(it runs on a variety of UNIXes). Only Linux uses SVGAlib. Also,
+poorly-written SVGAlib applications can mung-up your console, requiring a
+reboot. Finally, you shouldn't switch back and forth quickly between two
+consoles using SVGAlib graphics, or you risk screen corruption (forcing
+another reboot).
+
+<p>However, it is a myth that SVGAlib is a security risk. While SVGAlib
+apps must be setuid root, that privilege is given up immediately after
+execution. There is no need to be concerned.
+
+<p>In summary, despite the aforementioned problems, SVGAlib's speed and
+ease of use make it attractive in many situations. Especially if you just
+want to doodle on the screen.
+
+<p><b>Examples</b>
+
+<p>To use SVGAlib, you must reference it in your C program. Simply
+#include &lt;vga.h&gt; . Here's about the easiest SVGAlib program there
+is:
+
+<p><pre>
+#include &lt;stdlib.h&gt;
+#include &lt;vga.h&gt;
+ 
+int main(void)
+{
+   vga_init();
+   vga_setmode(G320x200x256);
+   vga_setcolor(4);
+   vga_drawpixel(10, 10);
+ 
+   sleep(5);
+   vga_setmode(TEXT);
+
+   return EXIT_SUCCESS;
+}
+</pre>
+
+<p>This will paint a single red pixel on your screen. After five seconds,
+it will reset your console to text mode and will exit.
+
+<p>Note our first statement, vga_init() . This relinquishes root status
+and initializes the SVGAlib library. The second line,
+vga_setmode(G320x200x256) , sets the screen to mode 5, which is
+320x200x256. That is to say, your screen becomes a grid which is 320
+pixels wide, 200 pixels high, and which supports 256 colors. 
+Alternatively, you could write vga_setmode(5).  Either statement is
+acceptable. Our next command, vga_setcolor(4) , makes red the current
+color. We can choose any value from 0 to 255.
+
+<p><b>Basic Colors</b>
+
+<p>In case you're interested, the 16 basic colors (for use with
+vga_setcolor() ) are:
+
+<p><pre>
+0      - black.
+1      - blue.
+2      - green.
+3      - cyan.
+4      - red.
+5      - magenta.
+6      - brown.
+7      - grey.
+8      - dark grey (light black).
+9      - light blue.
+10     - light green.
+11     - light cyan.
+12     - light red.
+13     - light magenta.
+14     - yellow (light brown).
+15     - white (light grey).
+</pre>
+
+<p>More colors are available with other commands, but we'll stick with
+these basic colors for this example. Finally, we paint our pixel at
+coordinate 10, 10 . This is eleven spaces right of the screen's left
+border, and eleven spaces down.  It's eleven, not ten, because the
+coordinate grid starts at 0.  Coordinate 0,0 is in the upper left-hand
+corner. Vga_setmode(TEXT) returns the screen to text mode. 
+Vga_setmode(TEXT) is identical to vga_setmode(0).  It's always nice to do
+this at the end of your program. Otherwise, you'll make life difficult for
+your users.
+
+<p>To compile this code, use the regular gcc compiler. You'll also need to
+link to SVGAlib with the -lvga command. Lastly, I suggest using -O3 , the
+best level of optimization. So here's our command:
+
+<p><pre>
+gcc -O3 -o sample sample.c -lvga
+</pre>
+
+<p>Then, to make it usable by non-root accounts, type:
+
+<p><pre>
+chmod u+s
+</pre>
+
+<p>To execute, just type:
+
+<p><pre>
+sample     (or whatever you named it)
+</pre>
+
+<p>The complete set of SVGAlib commands is documented in the SVGAlib man
+page. We won't go into all of them here, though. Instead, we'll write our
+second sample program using a faster set of SVGAlib functions: vgagl .
+
+<p>Type "man vgagl", and you'll see that vgagl is "a fast,
+framebuffer-level graphics library based on SVGAlib." Basically, it gives
+you advanced graphics functions, such as the ability to draw shapes with
+one statement.
+
+<p>Below is a program which uses vgagl. It should display a blue gradient
+screen, just like the ones that some installation programs use. It starts
+out as light blue on top of the screen, and gradually fades to black as it
+moves down. One thing that it does differently than the first program is
+that it does the drawing on an invisible "virtual" screen. When all the
+lines have been drawn, it copies the finished picture to the visible
+"physical" screen in one fell swoop. This eliminates screen flicker, and
+makes your application look more professional.  I like to think of the
+virtual screen as being "backstage", a place where "props" can be
+assembled between "acts" in the show.
+
+<p>To compile, I suggest typing:
+
+<p><pre>
+gcc -O3 -o gradient gradient.c -lvgagl -lvga
+</pre>
+
+<p>Note that -lvgagl comes before -lvga. It is mandatory that you refer to
+vgagl first when using that library. Did you remember to chmod u+s ?
+
+<p>Here's the code:
+
+<p><pre>
+#include &lt;stdlib.h&gt;
+#include &lt;vga.h&gt;
+#include &lt;vgagl.h&gt;
+
+GraphicsContext *physicalscreen;
+GraphicsContext *virtualscreen;
+ 
+int main(void)
+{
+   int i,
+       j,
+       b,
+       y,
+       c;
+ 
+   vga_init();
+   vga_setmode(G320x200x256);
+   gl_setcontextvga(G320x200x256);
+   physicalscreen = gl_allocatecontext();
+   gl_getcontext(physicalscreen);
+   gl_setcontextvgavirtual(G320x200x256);
+   virtualscreen = gl_allocatecontext();
+   gl_getcontext(virtualscreen);
+ 
+   gl_setcontext(virtualscreen);
+   y = 0;
+   c = 0;
+   gl_setpalettecolor(c, 0, 0, 0);
+   c++;
+   for (i = 0; i < 64; i++)
+   {
+      b = 63 - i;
+      gl_setpalettecolor(c, 0, 0, b);
+      for (j = 0; j < 3; j++)
+      {
+         gl_hline(0, y, 319, c);
+         y++;
+      }
+      c++;
+   }
+ 
+   gl_copyscreen(physicalscreen);
+ 
+   vga_getch();
+   gl_clearscreen(0);
+   vga_setmode(TEXT);
+
+   return EXIT_SUCCESS;
+}
+</pre>
+
+<p>Note that we now need to #include &lt;vgagl.h&gt;.
+
+<p>We start our code by setting the graphics context:
+
+<p><pre>
+GraphicsContext *physicalscreen
+GraphicsContext *virtualscreen
+</pre>
+
+<p>Then we'll declare our variables and use vga_setmode() to set the
+screen mode. We'll use mode 5 (G320x200x256) like before.
+
+<p>We need to initialize both the visible "physical" screen and the
+invisible "virtual" screen. We then save the contexts into variables:
+
+<p><pre>
+gl_setcontextvga(G320x200x256)
+physicalscreen = gl_allocatecontext()
+gl_getcontext(physicalscreen)
+gl_setcontextvgavirtual(G320x200x256)
+virtualscreen = gl_allocatecontext()
+gl_getcontext(virtualscreen)
+</pre>
+
+<p>We now announce that we'll be working with the virtual screen:
+gl_setcontext(virtualscreen).
+
+<p>Gl_setpalettecolor() gives us 64 shades of blue. We'll draw 3 lines per
+shade, for a total of 192 lines. The remaining eight lines will be black
+anyway, so they won't stand out.
+
+<p>When we are finished, we copy the contents of the virtual screen (our
+current screen) to the physical screen with gl_copyscreen(physicalscreen).
+
+<p>This time, we'll let the user decide how long to leave the picture
+visible. Getchar() waits for user input. After receiving a keystroke (any
+key, it doesn't matter which), we gl_clearscreen(0) and vga_setmode(0) to
+return to text.
+
+<p>The entire set of functions for SVGAlib can be viewed by typing "man
+svgalib" and "man vgagl". Then, each function has its own man page. After
+reading this introduction, you should be able to insert new commands into
+your own programs with relative ease. You also have the demo programs that
+came with SVGAlib from which to learn.
+
+<p>In the event that your distribution was incomplete, you can find the
+latest version of SVGAlib at metalab.unc.edu in pub/Linux/libs/graphics or
+at tsx-11.mit.edu in pub/linux/sources/libs . At the time of this writing,
+the current version is 1.3.0.
+
+<p>Finally, the Slackware distribution, while a good one, has a tendancy
+to install SVGAlib to the wrong directories. Getting and installing a new
+SVGAlib distribution from Metalab or MIT will fix that.
+
+<p>Enjoy!
+
+</font>
+
+</td>
+
+<td width=40>
+&nbsp;
+</td>
+
+<td width=160 valign=top>
+
+<font face="verdana,arial,helvetica" size=2>
+
+<font color="#999999">
+<p>:: summary
+</font>
+
+<p>Help to get you started.
+
+<font color="#999999">
+<p>:: navigate
+</font>
+
+<p><a href="http://www.svgalib.org">home</a><br>
+<a href="http://www.svgalib.org/programs.html">applications</a>
+
+</font>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+
+</html>
